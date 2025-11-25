@@ -205,5 +205,22 @@
     "QOTE": "here be islands in the Central Sea, whose waters are bounded by no shore and where no ships come — this is the faith of their people.",
     "POSTED_TO_NOSTR": true,
     "NOSTR_EVENT_ID": "aaf573d5f2f8af8c38fe48239d4b7fa879b6e1e1a74115eee06d7e206656f453"
+  },
+  "Mana-Yood-Sushai": {
+    "TYPE": [
+      "quote"
+    ],
+    "TAGS": [
+      "poem",
+      "Dunsany"
+    ],
+    "DATE": "12025-11-25",
+    "DONE": true,
+    "DIID": 13,
+    "NOSTR_KIND": 1,
+    "LINK": "https://en.wikipedia.org/wiki/The_Gods_of_Peg%C4%81na",
+    "QOTE": "In the mists before the Beginning, Fate and Chance cast lots to decide whose the Game should be; and he that won strode through the mists to Mana-Yood-Sushai and said: \"Now make gods for Me, for I have won the cast and the Game is to be Mine.\" Who it was that won the cast, and whether it was Fate or whether Chance that went through the mists before the Beginning to MAna-Yood-Sushai— none knoweth.",
+    "POSTED_TO_NOSTR": true,
+    "NOSTR_EVENT_ID": "4cd1bd09226e446d423f86bb5a48c6429430797a7a059d27004f070e876fb696"
   }
 }
