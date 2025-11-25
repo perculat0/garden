@@ -188,5 +188,22 @@
     "QOTE": "Turning and turning in the widening gyre    The falcon cannot hear the falconer;    Things fall apart; the centre cannot hold;    Mere anarchy is loosed upon the world,    The blood-dimmed tide is loosed, and everywhere    The ceremony of innocence is drowned;    The best lack all conviction, while the worst    Are full of passionate intensity.    Surely some revelation is at hand;    Surely the Second Coming is at hand.    The Second Coming! Hardly are those words out    When a vast image out of Spiritus Mundi    Troubles my sight: somewhere in sands of the desert    A shape with lion body and the head of a man,    A gaze blank and pitiless as the sun,    Is moving its slow thighs, while all about it    Reel shadows of the indignant desert birds.    The darkness drops again; but now I know    That twenty centuries of stony sleep    Were vexed to nightmare by a rocking cradle,    And what rough beast, its hour come round at last,    Slouches towards Bethlehem to be born?",
     "POSTED_TO_NOSTR": true,
     "NOSTR_EVENT_ID": "4b16a3edcc581e2b71a599a7a2be565e0efd06a75935a554498e82e4f7276702"
+  },
+  "The Gods of Pegana": {
+    "TYPE": [
+      "quote"
+    ],
+    "TAGS": [
+      "poem",
+      "Dunsany"
+    ],
+    "DATE": "12025-11-25",
+    "DONE": true,
+    "DIID": 12,
+    "NOSTR_KIND": 1,
+    "LINK": "https://en.wikipedia.org/wiki/Nyarlathotep",
+    "QOTE": "here be islands in the Central Sea, whose waters are bounded by no shore and where no ships come — this is the faith of their people.",
+    "POSTED_TO_NOSTR": true,
+    "NOSTR_EVENT_ID": "aaf573d5f2f8af8c38fe48239d4b7fa879b6e1e1a74115eee06d7e206656f453"
   }
 }
