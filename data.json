@@ -222,5 +222,22 @@
     "QOTE": "In the mists before the Beginning, Fate and Chance cast lots to decide whose the Game should be; and he that won strode through the mists to Mana-Yood-Sushai and said: \"Now make gods for Me, for I have won the cast and the Game is to be Mine.\" Who it was that won the cast, and whether it was Fate or whether Chance that went through the mists before the Beginning to MAna-Yood-Sushai— none knoweth.",
     "POSTED_TO_NOSTR": true,
     "NOSTR_EVENT_ID": "4cd1bd09226e446d423f86bb5a48c6429430797a7a059d27004f070e876fb696"
+  },
+  "Hengist and Horsa in Anglo-Saxon Tradition": {
+    "TYPE": [
+      "quote"
+    ],
+    "TAGS": [
+      "myth",
+      "legend"
+    ],
+    "DATE": "12025-12-10",
+    "DONE": true,
+    "DIID": 14,
+    "NOSTR_KIND": 1,
+    "MEDIA_URL": "blob:https://web.telegram.org/2f6a0c07-73ec-4161-a0bf-c39ca05cb63d",
+    "QOTE": "The brothers Hengist and Horsa appear in the earliest accounts of the Anglo-Saxon migration to Britain. Bede’s Ecclesiastical History and the Anglo-Saxon Chronicle record that they were invited by the British ruler Vortigern in the mid-5th century as mercenaries against the Picts. After turning against him, they established their own power, remembered as the foundation of the Anglo-Saxon kingdoms. Hengist is often cited as the first King of Kent, while Horsa is said to have fallen in battle.In 1776, when Congress tasked Thomas Jefferson, John Adams, and Benjamin Franklin with designing a national seal, Jefferson proposed using Hengist and Horsa. He called them “the Saxon chiefs from whom we claim the honor of being descended.” For Jefferson, they symbolized liberty, law, and the Anglo-Saxon heritage of self-rule. Though the design was not adopted, it reveals how America’s founders connected their new nation to ancient Germanic tradition.",
+    "POSTED_TO_NOSTR": true,
+    "NOSTR_EVENT_ID": "aec06b55c914d4e7e909bd41e5701234342f77ff23083e1e1db1db5a4ed7be37"
   }
 }
