@@ -13,6 +13,33 @@ from nostr.key import PrivateKey
 from nostr.event import Event
 from nostr.relay_manager import RelayManager
 
+ALLOWED_TYPES = {
+    "note",
+    "quote",
+    "article",
+    "image",
+    "video",
+    "link",
+    "rant",
+    "dictionary",
+    "research",
+    "log",
+}
+
+TYPE_KIND_MAP = {
+    "note": 1,
+    "quote": 1,
+    "rant": 1,
+    "link": 1,
+    "image": 1,
+    "video": 1,
+    "log": 1,
+
+    "article": 30023,
+    "dictionary": 30023,
+    "research": 30023,
+}
+
 
 # ========================
 # CONFIG & IO
@@ -91,6 +118,12 @@ def next_diid(garden: dict) -> int:
             diids.append(entry["DIID"])
     return (max(diids) + 1) if diids else 0
 
+def is_media_url(url: str) -> bool:
+    if not url:
+        return False
+    url = url.lower()
+    media_exts = (".png", ".jpg", ".jpeg", ".webp", ".gif", ".mp4", ".webm")
+    return any(url.split("?")[0].endswith(ext) for ext in media_exts)
 
 # ========================
 # CONTENT FORMATTING
@@ -99,27 +132,22 @@ def next_diid(garden: dict) -> int:
 def format_entry_content(title: str, entry: dict) -> str:
     """
     Costruisce il testo del post Nostr a partire dalla entry del garden.
+    NON include più la data nel contenuto pubblicato.
     """
     lines = []
 
     # Titolo
     lines.append(f"{title}")
 
-    # Type & date
+    # Type (senza data)
     types = entry.get("TYPE", [])
     if isinstance(types, list):
         type_str = ", ".join(types)
     else:
         type_str = str(types) if types else ""
 
-    date_str = entry.get("DATE")
-    meta_bits = []
     if type_str:
-        meta_bits.append(type_str)
-    if date_str:
-        meta_bits.append(date_str)
-    if meta_bits:
-        lines.append(" · ".join(meta_bits))
+        lines.append(type_str)
 
     # Tags inline
     tags = entry.get("TAGS", [])
@@ -141,11 +169,17 @@ def format_entry_content(title: str, entry: dict) -> str:
             else:
                 lines.append(f"> {q}")
 
-    # Link finale
+    # Link "normale"
     link = entry.get("LINK")
-    if link:
+    if link and not is_media_url(link):
         lines.append("")
         lines.append(f"🔗 {link}")
+
+    # Media (immagine/video)
+    media_url = entry.get("MEDIA_URL")
+    if media_url:
+        lines.append("")
+        lines.append(media_url)
 
     return "\n".join(lines).strip()
 
@@ -157,6 +191,7 @@ def format_entry_content(title: str, entry: dict) -> str:
 def publish_to_nostr(content: str, nsec: str, relays: list[str], kind: int = 1) -> str:
     """
     Pubblica un evento Nostr con kind selezionabile.
+    Versione minimale e robusta: niente tag extra, solo testo.
     """
     private_key = PrivateKey.from_nsec(nsec)
     event = Event(private_key.public_key.hex(), content, kind=kind)
@@ -209,30 +244,53 @@ def create_entry_interactive(garden: dict, nostr_kind_default: int) -> tuple[str
     if not title:
         raise RuntimeError("Titolo obbligatorio.")
 
-    # TYPE
-    type_raw = input("TYPE (lista separata da virgola, es: quote,article,video) [quote]: ").strip()
-    if not type_raw:
-        types = ["quote"]
-    else:
-        types = [t.strip() for t in type_raw.split(",") if t.strip()]
+    # TYPE (validato)
+    while True:
+        type_raw = input(
+            "TYPE (lista separata da virgola, es: quote,article,video) [quote]: "
+        ).strip()
+
+        if not type_raw:
+            types = ["quote"]
+        else:
+            types = [t.strip().lower() for t in type_raw.split(",") if t.strip()]
+
+        invalid = [t for t in types if t not in ALLOWED_TYPES]
+        if invalid:
+            print("❌ TYPE non validi:", ", ".join(invalid))
+            print("   TYPE ammessi:", ", ".join(sorted(ALLOWED_TYPES)))
+            print("   Riprova.\n")
+            continue
+
+        break
 
     # TAGS
     tags_raw = input("TAGS (lista separata da virgola, opzionale): ").strip()
     tags = [t.strip() for t in tags_raw.split(",") if t.strip()] if tags_raw else []
 
-    # LINK
-    link = input("LINK (opzionale): ").strip()
+    # LINK (es. articolo, tweet, ecc.)
+    link = input("LINK (opzionale, es. articolo/pagina): ").strip()
     if not link:
         link = None
 
-    # DATA
+    # MEDIA_URL (immagine/video)
+    media_url = input("MEDIA URL (opzionale, .png/.jpg/.jpeg/.webp/.gif/.mp4/.webm): ").strip()
+    if not media_url:
+        media_url = None
+
+    # se non hai messo MEDIA_URL ma il LINK è chiaramente un media, lo uso come media
+    if not media_url and link and is_media_url(link):
+        media_url = link
+
+    # DATA (solo nel JSON, NON più nel contenuto Nostr)
     default_date = holocene_today()
     date_str = input(f"DATE (formato 12025-11-18) [{default_date}]: ").strip()
     if not date_str:
         date_str = default_date
 
-    # NOSTR_KIND
-    nostr_kind = safe_int_input("NOSTR_KIND (1=text note, 30023=long-form ecc.)", nostr_kind_default)
+    # NOSTR_KIND dedotto dalla TYPE principale
+    primary_type = types[0]
+    nostr_kind = TYPE_KIND_MAP.get(primary_type, nostr_kind_default)
 
     # QOTE / testo
     print("Testo / QOTE (linee multiple, invio su riga vuota per terminare):")
@@ -255,7 +313,7 @@ def create_entry_interactive(garden: dict, nostr_kind_default: int) -> tuple[str
     entry = {
         "TYPE": types,
         "TAGS": tags,
-        "DATE": date_str,
+        "DATE": date_str,      # resta nel JSON
         "DONE": True,
         "DIID": diid,
         "NOSTR_KIND": nostr_kind,
@@ -263,6 +321,8 @@ def create_entry_interactive(garden: dict, nostr_kind_default: int) -> tuple[str
 
     if link:
         entry["LINK"] = link
+    if media_url:
+        entry["MEDIA_URL"] = media_url
     if qote != "":
         entry["QOTE"] = qote
 
@@ -323,7 +383,6 @@ def mode_create_and_publish(repo_path, json_path, nsec, relays, nostr_kind_defau
     )
     print("✅ Garden aggiornato e pushato su git.")
 
-
 def mode_publish_pending(repo_path, json_path, nsec, relays, min_diid):
     garden = load_garden(json_path)
     published_any = False
@@ -337,6 +396,7 @@ def mode_publish_pending(repo_path, json_path, nsec, relays, min_diid):
             continue
 
         kind = entry.get("NOSTR_KIND", 1)
+
         print(f"▶ Pubblico: {title} (DIID={entry.get('DIID')} kind={kind})")
 
         content = format_entry_content(title, entry)

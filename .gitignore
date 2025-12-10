@@ -2,3 +2,8 @@ __pycache__/
 
 icons/
 fonts/
+# env & credenziali
+.env
+.env.*.local
+*.key
+*.pem
