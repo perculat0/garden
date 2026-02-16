@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 import json
+import mimetypes
 import os
+import re
 import ssl
 import subprocess
 import sys
 import time
+import urllib.error
+import urllib.request
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlparse
 
-from atproto import Client as AtprotoClient
+from atproto import Client as AtprotoClient, models
 from dotenv import load_dotenv
 from nostr.key import PrivateKey
 from nostr.event import Event
@@ -42,6 +47,7 @@ TYPE_KIND_MAP = {
 }
 
 BLUESKY_MAX_POST_LENGTH = 300
+BLUESKY_DESC_MAX_LENGTH = 300
 
 
 # ========================
@@ -146,6 +152,21 @@ def is_media_url(url: str) -> bool:
     return any(url.split("?")[0].endswith(ext) for ext in media_exts)
 
 
+def is_web_url(url: str) -> bool:
+    if not url:
+        return False
+    parsed = urlparse(url)
+    return parsed.scheme in ("http", "https")
+
+
+def is_image_url(url: str) -> bool:
+    if not url:
+        return False
+    path = urlparse(url).path.lower()
+    image_exts = (".png", ".jpg", ".jpeg", ".webp", ".gif")
+    return any(path.endswith(ext) for ext in image_exts)
+
+
 def shorten_for_bluesky(content: str, max_len: int = BLUESKY_MAX_POST_LENGTH) -> str:
     text = content.strip()
     if len(text) <= max_len:
@@ -153,6 +174,144 @@ def shorten_for_bluesky(content: str, max_len: int = BLUESKY_MAX_POST_LENGTH) ->
     if max_len <= 1:
         return text[:max_len]
     return text[: max_len - 1].rstrip() + "…"
+
+
+def clean_text_line(line: str) -> str:
+    line = line.strip()
+    if line.startswith(">"):
+        line = line[1:].strip()
+    return re.sub(r"\s+", " ", line)
+
+
+def entry_description_for_bluesky(entry: dict, max_len: int = BLUESKY_DESC_MAX_LENGTH) -> str:
+    qote = entry.get("QOTE")
+    parts = []
+
+    if isinstance(qote, list):
+        for item in qote:
+            if isinstance(item, str):
+                clean = clean_text_line(item)
+                if clean:
+                    parts.append(clean)
+    elif isinstance(qote, str):
+        clean = clean_text_line(qote)
+        if clean:
+            parts.append(clean)
+
+    text = " ".join(parts).strip()
+    if not text:
+        tags = entry.get("TAGS", [])
+        if isinstance(tags, list) and tags:
+            text = "Tags: " + ", ".join(str(t) for t in tags)
+
+    if not text:
+        text = "Shared from my digital garden."
+
+    if len(text) <= max_len:
+        return text
+    return text[: max_len - 1].rstrip() + "…"
+
+
+def title_for_bluesky_card(title: str, max_len: int = 100) -> str:
+    t = re.sub(r"\s+", " ", (title or "").strip())
+    if len(t) <= max_len:
+        return t
+    return t[: max_len - 1].rstrip() + "…"
+
+
+def load_media_bytes(media_url: str, repo_path: Path) -> tuple[bytes | None, str | None]:
+    if not media_url:
+        return None, None
+
+    if media_url.startswith("blob:"):
+        return None, None
+
+    if is_web_url(media_url):
+        req = urllib.request.Request(
+            media_url,
+            headers={"User-Agent": "post_note.py/1.0 (+digital-garden)"},
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = resp.read()
+                mime_type = resp.headers.get_content_type()
+                if mime_type == "application/octet-stream":
+                    guessed, _ = mimetypes.guess_type(media_url)
+                    mime_type = guessed or mime_type
+                return data, mime_type
+        except (urllib.error.URLError, TimeoutError):
+            return None, None
+
+    local_path = Path(media_url)
+    if not local_path.is_absolute():
+        local_path = (repo_path / local_path).resolve()
+
+    if not local_path.exists() or not local_path.is_file():
+        return None, None
+
+    try:
+        data = local_path.read_bytes()
+    except OSError:
+        return None, None
+
+    guessed, _ = mimetypes.guess_type(local_path.name)
+    return data, guessed or "application/octet-stream"
+
+
+def build_bluesky_embed(
+    client: AtprotoClient,
+    title: str,
+    entry: dict,
+    repo_path: Path,
+):
+    link = entry.get("LINK")
+    media_url = entry.get("MEDIA_URL")
+
+    if isinstance(link, list):
+        link = next((x for x in link if isinstance(x, str) and x.strip()), None)
+
+    if isinstance(media_url, list):
+        media_url = next((x for x in media_url if isinstance(x, str) and x.strip()), None)
+
+    thumb_blob = None
+    media_uploaded = False
+
+    if isinstance(media_url, str) and is_image_url(media_url):
+        try:
+            media_bytes, _ = load_media_bytes(media_url, repo_path)
+            if media_bytes:
+                thumb_response = client.upload_blob(media_bytes)
+                thumb_blob = thumb_response.blob
+                media_uploaded = True
+        except Exception:
+            thumb_blob = None
+            media_uploaded = False
+
+    if isinstance(link, str) and is_web_url(link):
+        external = models.AppBskyEmbedExternal.External(
+            title=title_for_bluesky_card(title),
+            description=entry_description_for_bluesky(entry),
+            uri=link,
+            thumb=thumb_blob,
+        )
+        return (
+            models.AppBskyEmbedExternal.Main(external=external),
+            "external",
+            media_uploaded,
+        )
+
+    if thumb_blob is not None:
+        image = models.AppBskyEmbedImages.Image(
+            alt=title_for_bluesky_card(title),
+            image=thumb_blob,
+        )
+        return (
+            models.AppBskyEmbedImages.Main(images=[image]),
+            "images",
+            media_uploaded,
+        )
+
+    return None, None, False
 
 # ========================
 # CONTENT FORMATTING
@@ -240,19 +399,40 @@ def publish_to_nostr(content: str, nsec: str, relays: list[str], kind: int = 1) 
     return event.id
 
 
-def publish_to_bluesky(content: str, identifier: str, app_password: str) -> tuple[str, str, str]:
+def publish_to_bluesky(
+    content: str,
+    title: str,
+    entry: dict,
+    repo_path: Path,
+    identifier: str,
+    app_password: str,
+) -> tuple[str, str, str, str | None, bool]:
     """
     Pubblica su Bluesky con app password.
-    Ritorna (uri, cid, text_posted).
+    Ritorna (uri, cid, text_posted, embed_type, media_uploaded).
     """
     text_to_post = shorten_for_bluesky(content)
     client = AtprotoClient()
     client.login(identifier, app_password)
-    post_result = client.send_post(text_to_post)
+    embed, embed_type, media_uploaded = build_bluesky_embed(
+        client=client,
+        title=title,
+        entry=entry,
+        repo_path=repo_path,
+    )
+    if embed is not None:
+        try:
+            post_result = client.send_post(text_to_post, embed=embed)
+        except Exception:
+            post_result = client.send_post(text_to_post)
+            embed_type = None
+            media_uploaded = False
+    else:
+        post_result = client.send_post(text_to_post)
 
     uri = getattr(post_result, "uri", "")
     cid = getattr(post_result, "cid", "")
-    return str(uri), str(cid), text_to_post
+    return str(uri), str(cid), text_to_post, embed_type, media_uploaded
 
 
 # ========================
@@ -423,8 +603,11 @@ def mode_create_and_publish(
     print(f"✓ Pubblicato su Nostr. Event ID: {event_id}")
 
     # 4) Pubblica su Bluesky
-    bsky_uri, bsky_cid, bsky_text = publish_to_bluesky(
+    bsky_uri, bsky_cid, bsky_text, bsky_embed_type, bsky_media_uploaded = publish_to_bluesky(
         content,
+        title,
+        entry,
+        repo_path,
         bsky_identifier,
         bsky_app_password,
     )
@@ -437,6 +620,10 @@ def mode_create_and_publish(
     entry["BLUESKY_URI"] = bsky_uri
     entry["BLUESKY_CID"] = bsky_cid
     entry["BLUESKY_TEXT"] = bsky_text
+    if bsky_embed_type:
+        entry["BLUESKY_EMBED_TYPE"] = bsky_embed_type
+    if bsky_media_uploaded:
+        entry["BLUESKY_MEDIA_UPLOADED"] = True
 
     garden[title] = entry
     save_garden(json_path, garden)
@@ -488,8 +675,11 @@ def mode_publish_pending(
             published_any = True
 
         if missing_bluesky:
-            bsky_uri, bsky_cid, bsky_text = publish_to_bluesky(
+            bsky_uri, bsky_cid, bsky_text, bsky_embed_type, bsky_media_uploaded = publish_to_bluesky(
                 content,
+                title,
+                entry,
+                repo_path,
                 bsky_identifier,
                 bsky_app_password,
             )
@@ -498,6 +688,10 @@ def mode_publish_pending(
             entry["BLUESKY_URI"] = bsky_uri
             entry["BLUESKY_CID"] = bsky_cid
             entry["BLUESKY_TEXT"] = bsky_text
+            if bsky_embed_type:
+                entry["BLUESKY_EMBED_TYPE"] = bsky_embed_type
+            if bsky_media_uploaded:
+                entry["BLUESKY_MEDIA_UPLOADED"] = True
             published_any = True
 
     if not published_any:

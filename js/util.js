@@ -66,6 +66,26 @@ function Util()
     return (/\.(gif|jpg|jpeg|tiff|png)$/i).test(filename);
   }
 
+  this.isImageUrl = function(url)
+  {
+    if (!this.isDefined(url) || !url)
+    {
+      return false;
+    }
+    let clean = String(url).split('?')[0];
+    return (/\.(gif|jpg|jpeg|png|webp)$/i).test(clean);
+  }
+
+  this.isVideoUrl = function(url)
+  {
+    if (!this.isDefined(url) || !url)
+    {
+      return false;
+    }
+    let clean = String(url).split('?')[0];
+    return (/\.(mp4|webm|ogg|mov)$/i).test(clean);
+  }
+
   this.isType = function(typeArray, value)
   {
     if (this.isDefined(typeArray))

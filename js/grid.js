@@ -313,6 +313,12 @@ function Grid()
           article += `</div>`;
         }
 
+        // MEDIA_URL (remote image/video)
+        if (SETTINGS.SHOWIMAG && main.util.isDefined(value.MEDIA_URL))
+        {
+          article += this.doMedia(value.MEDIA_URL);
+        }
+
         // FILE
         if (SETTINGS.SHOWFILE && main.util.isDefined(value.FILE))
         {
@@ -334,6 +340,42 @@ function Grid()
         article += `</div>`;
       }
       return article;
+    }
+
+    this.doMedia = function(media)
+    {
+      let mediaItems = Array.isArray(media) ? media : [media];
+      let result = '';
+
+      for (let i = 0; i < mediaItems.length; i++)
+      {
+        let mediaUrl = String(mediaItems[i] || '').trim();
+        if (mediaUrl === '')
+        {
+          continue;
+        }
+
+        if (main.util.isImageUrl(mediaUrl))
+        {
+          result += `<div class="article-media">`;
+          result += `<img class="article-media-img" src="${mediaUrl}" loading="lazy" alt="media">`;
+          result += `</div>`;
+        }
+        else if (main.util.isVideoUrl(mediaUrl))
+        {
+          result += `<div class="article-media">`;
+          result += `<video class="article-media-video" controls preload="metadata">`;
+          result += `<source src="${mediaUrl}">`;
+          result += `</video>`;
+          result += `</div>`;
+        }
+        else
+        {
+          result += this.doRow('file', `<a class="article-file-link" href="${mediaUrl}" target="_blank" rel="noopener noreferrer">${mediaUrl}</a>`, 'article-file');
+        }
+      }
+
+      return result;
     }
 
     this.doRow = function(type, content, extraClass)

@@ -525,6 +525,22 @@ article:hover .article-rowtext {
   word-break: break-all;
 }
 
+.article-media {
+  float: left;
+  clear: both;
+  width: calc(100% + var(--size-grid-gutter)*2);
+  margin-left: calc(-1 * var(--size-grid-gutter));
+  margin-right: calc(-1 * var(--size-grid-gutter));
+  margin-top: var(--size-grid-gutter);
+}
+.article-media-img,
+.article-media-video {
+  display: block;
+  width: 100%;
+  max-height: 1000px;
+  background: #000;
+}
+
 /* IMAGE */
 .article-containerlower-image {
   display: none;
