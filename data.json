@@ -276,5 +276,29 @@
     "BLUESKY_URI": "at://did:plc:jwd5bflvhakxk3x6yxhymfi6/app.bsky.feed.post/3mey4kk4awf2p",
     "BLUESKY_CID": "bafyreibzylea6ioqfzppt7j7lri2bklzjivgxk5cvrb55dgku232od6ktm",
     "BLUESKY_TEXT": "What the Epstein files reveal about EV startups and Silicon Valley\narticle\n#epstein #silicon_valley\n\n> One in particular, this company called Canoo, which is now bankrupt and out of business, had maybe the most mysterious set of investors of all of them. They really were not upfront about it when t…"
+  },
+  "You're Gonna Need A Bigger Browser": {
+    "TYPE": [
+      "article"
+    ],
+    "TAGS": [
+      "ai",
+      "agents"
+    ],
+    "DATE": "12026-02-16",
+    "DONE": true,
+    "DIID": 17,
+    "NOSTR_KIND": 30023,
+    "LINK": "https://berjon.com/bigger-browser/",
+    "MEDIA_URL": "https://berjon.com/bigger-browser/big-carp.jpg",
+    "QOTE": "But our idea of what a browser is and does for us hasn't moved much in a long time and if we intend to work towards greater user agency it seems plausible that we should at the very least be open to considering a major overhaul of what a Web user agent looks like.",
+    "POSTED_TO_NOSTR": true,
+    "NOSTR_EVENT_ID": "083314d6c9be2bfff7150848aa7aa5cb134906bba37b5c736e000813b3934aef",
+    "POSTED_TO_BLUESKY": true,
+    "BLUESKY_URI": "at://did:plc:jwd5bflvhakxk3x6yxhymfi6/app.bsky.feed.post/3meyfz543ys2i",
+    "BLUESKY_CID": "bafyreidl3xatahqmdlztu5xmkph47eukynywzfjpmlg2ht7xgbqyrsmi6u",
+    "BLUESKY_TEXT": "You're Gonna Need A Bigger Browser\narticle\n#ai #agents\n\n> But our idea of what a browser is and does for us hasn't moved much in a long time and if we intend to work towards greater user agency it seems plausible that we should at the very least be open to considering a major overhaul of what a Web…",
+    "BLUESKY_EMBED_TYPE": "external",
+    "BLUESKY_MEDIA_UPLOADED": true
   }
 }
