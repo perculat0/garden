@@ -254,5 +254,27 @@
     "MEDIA_URL": "blob:https://web.telegram.org/2d0e28a7-c9bd-48fd-9274-8fe0a7a12532",
     "POSTED_TO_NOSTR": true,
     "NOSTR_EVENT_ID": "f25047a113fe32b9ddffab8cd8a250f5ab5cc9ccdc4467a174393b3cfb8c62c9"
+  },
+  "What the Epstein files reveal about EV startups and Silicon Valley": {
+    "TYPE": [
+      "article"
+    ],
+    "TAGS": [
+      "epstein",
+      "silicon valley"
+    ],
+    "DATE": "12026-02-16",
+    "DONE": true,
+    "DIID": 16,
+    "NOSTR_KIND": 30023,
+    "LINK": "https://techcrunch.com/2026/02/15/what-the-epstein-files-reveal-about-ev-startups-and-silicon-valley/",
+    "MEDIA_URL": "https://techcrunch.com/wp-content/uploads/2026/02/jeffrey-epstein_8ef3e8.jpg?resize=900,600",
+    "QOTE": "One in particular, this company called Canoo, which is now bankrupt and out of business, had maybe the most mysterious set of investors of all of them. They really were not upfront about it when they first sort of came out of stealth in early 2018. And it frankly took until there was a lawsuit between some people who ran the company near the top that the investors were revealed.",
+    "POSTED_TO_NOSTR": true,
+    "NOSTR_EVENT_ID": "e88f8818bca5ae6bca2575be8ce622559600a340e67aa6b3f644747802cb09fc",
+    "POSTED_TO_BLUESKY": true,
+    "BLUESKY_URI": "at://did:plc:jwd5bflvhakxk3x6yxhymfi6/app.bsky.feed.post/3mey4kk4awf2p",
+    "BLUESKY_CID": "bafyreibzylea6ioqfzppt7j7lri2bklzjivgxk5cvrb55dgku232od6ktm",
+    "BLUESKY_TEXT": "What the Epstein files reveal about EV startups and Silicon Valley\narticle\n#epstein #silicon_valley\n\n> One in particular, this company called Canoo, which is now bankrupt and out of business, had maybe the most mysterious set of investors of all of them. They really were not upfront about it when t…"
   }
 }
