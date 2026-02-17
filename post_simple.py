@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 import argparse
 import os
+import subprocess
 import ssl
 import sys
 import time
+from pathlib import Path
 
 from atproto import Client as AtprotoClient
 from dotenv import load_dotenv
@@ -60,6 +62,14 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def run_build() -> None:
+    repo_path = Path(os.environ.get("GARDEN_REPO_PATH", ".")).resolve()
+    build_script = repo_path / "build.py"
+    if not build_script.exists():
+        raise RuntimeError(f"build.py non trovato in {repo_path}")
+    subprocess.run([sys.executable, str(build_script)], cwd=repo_path, check=True)
+
+
 def main() -> int:
     args = parse_args()
     load_dotenv()
@@ -95,6 +105,9 @@ def main() -> int:
         text_for_bsky = shorten_for_bluesky(text)
         uri = publish_to_bluesky(text_for_bsky, identifier, app_password)
         print(f"✓ Bluesky pubblicato. URI: {uri}")
+
+    run_build()
+    print("✓ Build statico aggiornato.")
 
     return 0
 

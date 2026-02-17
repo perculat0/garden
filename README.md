@@ -2,37 +2,44 @@
 
 A personal digital garden served as a static website, with Python automation to publish entries to Nostr and Bluesky.
 
-This repository combines:
-- a client-side garden UI (`index.html`, `css/`, `js/`, `data.json`)
-- publishing tools for Nostr + Bluesky (`post_note.py`, `post_simple.py`)
-- Bluesky timeline CLI viewers (`bluesky_timeline.py`, `bsky_timeline_cli.py`)
+This repository now includes a static SEO build pipeline:
+- prerendered homepage content in `index.html`
+- one HTML page per note in `notes/`
+- generated `sitemap.xml`
 
 ## Repository Structure
 
-- `index.html`: main page for the garden.
-- `data.json`: canonical content database (title -> entry object).
-- `css/style.css`: all UI styling (menu, masonry cards, lightbox, overlays).
-- `js/main.js`: app bootstrap and render pipeline.
-- `js/grid.js`: HTML generation for cards + media handling + masonry layout integration.
-- `js/wrap.js`: filtering and statistics logic.
-- `js/nav.js`: left menu rendering (counts, type/tag filters).
-- `js/util.js`: icons and helpers (URL/media/type checks).
-- `js/theme.js`: theme loader/persistence via `localStorage`.
-- `js/lightbox.js`: click-to-zoom image viewer.
-- `js/seer.js`: lightweight timing profiler.
-- `js/imagesloaded.js`, `js/masonry.js`: bundled third-party libs.
-- `post_note.py`: interactive entry creation + publish to Nostr and Bluesky + git commit/push.
-- `post_simple.py`: publish a plain text message to Nostr/Bluesky.
-- `bluesky_timeline.py`: Bluesky timeline CLI (atproto client version).
-- `bsky_timeline_cli.py`: Bluesky timeline CLI (raw XRPC HTTP version).
-- `.env_example`: required environment variables.
-- `sw.js`, `manifest.json`: basic PWA/offline cache setup.
-- `.well-known/nostr.json` and `nostr.json`: NIP-05 style Nostr mapping.
-- `CNAME`: custom domain for static hosting.
+- `data.json`: canonical content database (`title -> entry object`)
+- `build.py`: static build generator (index prerender + note pages + sitemap)
+- `index.html`: main page template + prerendered note content
+- `notes/`: generated static pages, one per note (`notes/<slug>.html`)
+- `sitemap.xml`: generated sitemap for crawlers
+- `css/style.css`: UI styling
+- `js/`: frontend app (filters, masonry, lightbox, nav, helpers)
+- `post_note.py`: interactive note creation + publish to Nostr/Bluesky + auto build + git commit/push
+- `post_simple.py`: simple text publish to Nostr/Bluesky + auto build
+- `note.py`: unified CLI wrapper for `post_note.py` / `post_simple.py`
+- `bluesky_timeline.py`, `bsky_timeline_cli.py`: Bluesky timeline CLIs
+- `.env_example`: required environment variables
+- `.well-known/nostr.json`, `nostr.json`: Nostr mappings
+- `CNAME`: custom domain used by static hosting
+
+## What Changed (SEO Build Step)
+
+Before:
+- note content was loaded client-side from `data.json` after page load
+
+Now:
+- `build.py` prerenders content directly into `index.html`
+- `build.py` creates `notes/<slug>.html` for every entry
+- `build.py` creates `sitemap.xml` using `GARDEN_SITE_URL` or `CNAME`
+- `build.py` ensures `index.html` has `meta name="robots" content="index, follow"`
+
+This makes the site much more crawler-friendly.
 
 ## Data Model (`data.json`)
 
-Each top-level key is the note title. The value is an object with fields such as:
+Each top-level key is the note title. Value is an object with fields like:
 
 Core fields:
 - `TYPE` (array of strings)
@@ -44,94 +51,98 @@ Core fields:
 
 Optional content fields:
 - `LINK` (string or array)
-- `MEDIA_URL` (string or array; remote image/video or URL)
+- `MEDIA_URL` (string or array; remote image/video/url)
 - `TERM`, `NOTE`, `PROG`, `AUTH`, `PROJ`, `FILE`, `WIDE`, `SEEN`
 
-Publishing metadata fields (added by automation):
+Publishing metadata (added by automation):
 - `NOSTR_KIND`, `POSTED_TO_NOSTR`, `NOSTR_EVENT_ID`
 - `POSTED_TO_BLUESKY`, `BLUESKY_URI`, `BLUESKY_CID`, `BLUESKY_TEXT`
 - `BLUESKY_EMBED_TYPE`, `BLUESKY_MEDIA_UPLOADED`
 
-## Frontend Behavior
+## Build Pipeline (`build.py`)
 
-### Rendering flow
-1. `main.start()` fetches `data.json`.
-2. `wrap.stats()` computes totals, types, tags, terms, done count.
-3. `nav.display()` builds filter/navigation menu.
-4. `wrap.filter()` applies hash-based filters (`#type-x`, `#tag-y`, `#done-true`, `#term`, etc.).
-5. `grid.buildAllArticles()` renders card HTML.
-6. Masonry layout is applied and recalculated as images load.
+Default run:
+```bash
+python build.py
+```
 
-### Supported card content
-- Title, type icons, done status
-- Date, author, tags, projects
-- Multi-line quote/note/progress/term blocks
-- Links (single or multiple)
-- Local media files from `content/media/`
-- Remote media through `MEDIA_URL`:
-  - image extensions render `<img>`
-  - video extensions render `<video controls>`
-  - other URLs are rendered as clickable links
+What it does:
+1. Reads `data.json`
+2. Sorts entries (prefers `DIID`, falls back to `DATE`)
+3. Generates stable slugs from note titles
+4. Writes `notes/<slug>.html` for each entry
+5. Removes stale generated note pages
+6. Replaces content inside `<main>...</main>` in `index.html` with prerendered cards
+7. Updates robots meta to `index, follow`
+8. Generates `sitemap.xml` if a site URL is available
 
-### UI features
-- Left fixed navigation with aggregate counts
-- Hash routing filters (no backend required)
-- Lightbox for image expansion
-- Theme persistence via `localStorage`
-- Service worker cache for core assets
+Optional args:
+```bash
+python build.py --data data.json --index-template index.html --notes-dir notes --sitemap sitemap.xml --site-url https://example.com
+```
 
-## Python Automation
+Site URL resolution priority:
+1. `--site-url`
+2. `GARDEN_SITE_URL` env var
+3. `CNAME` (`https://<cname>`)
 
-## `post_note.py` (main workflow)
+## Publishing Workflows
 
-Interactive mode (default):
-1. Prompts for title, `TYPE`, tags, link, media URL, date, and multi-line text.
-2. Auto-generates next `DIID`.
-3. Determines `NOSTR_KIND` from `TYPE` (`note/quote/link/...` -> kind 1, `article/dictionary/research` -> kind 30023).
-4. Builds post text from title + quote/text + link + media.
-5. Publishes to Nostr.
-6. Publishes to Bluesky (300-char text cap; optional external/image embed).
-7. Writes social metadata back to `data.json`.
-8. Runs `git add`, `git commit`, and `git push`.
+### `post_note.py` (interactive)
+
+Main flow:
+1. Prompt for title/types/tags/link/media/date/text
+2. Publish to Nostr
+3. Publish to Bluesky
+4. Update `data.json`
+5. Run `build.py` automatically
+6. Git add/commit/push (`data.json`, `index.html`, `notes/`, `sitemap.xml`)
 
 Pending mode:
-- `python post_note.py --pending`
-- Publishes entries where `DONE=true` and at least one of Nostr/Bluesky is missing.
-- Optional `MIN_DIID` gate prevents older entries from being republished.
+```bash
+python post_note.py --pending
+```
+Publishes entries with `DONE=true` and missing social publication, then runs build + git push.
 
-Bluesky embed logic:
-- If `LINK` is a web URL, it builds an external card embed.
-- If `MEDIA_URL` is an image, it tries to upload it as thumbnail.
-- If embed upload fails, it falls back to plain text post.
-
-## `post_simple.py`
-
-Minimal publisher for plain text posts.
+### `post_simple.py`
 
 Examples:
-- `python post_simple.py "Hello world"`
-- `python post_simple.py --target bluesky "Only on Bluesky"`
-- `python post_simple.py --target nostr "Only on Nostr"`
+```bash
+python post_simple.py "Hello world"
+python post_simple.py --target bluesky "Only on Bluesky"
+python post_simple.py --target nostr "Only on Nostr"
+```
 
-## Bluesky Timeline CLIs
+After posting, it now runs `build.py` automatically.
 
-### `bluesky_timeline.py` (atproto SDK)
-- Auth via app password.
-- Fetches accounts you follow.
-- Polls timeline every `--refresh` seconds.
-- Shows only:
-  - posts from followed DIDs
-  - text-only posts (no embeds)
-  - non-NSFW labeled content
+## Unified CLI (`note.py`)
 
-### `bsky_timeline_cli.py` (raw HTTP/XRPC)
-- Same user-facing behavior via direct HTTP calls.
-- Supports custom `--pds` endpoint.
-- Handles token refresh on 401 by recreating session.
+Use one command entrypoint for publishing scripts.
+
+Examples:
+```bash
+python note.py --post-note
+python note.py --post-note --pending
+python note.py --post-simple "Hello world"
+python note.py --post-simple --target nostr "Only on Nostr"
+```
+
+`note.py` forwards extra arguments to the selected underlying script.
+
+## Frontend Runtime Behavior
+
+Even with prerendered HTML, frontend JS still runs for:
+- filtering/navigation
+- masonry layout
+- lightbox and UI interactions
+
+So you get both:
+- crawlable initial HTML
+- interactive client-side UX
 
 ## Environment Configuration
 
-Copy `.env_example` to `.env` and set credentials.
+Copy `.env_example` to `.env`.
 
 Required:
 - `NOSTR_NSEC`
@@ -140,31 +151,31 @@ Required:
 
 Common optional:
 - `GARDEN_REPO_PATH` (default `.`)
-- `GARDEN_JSON_FILE` (default `garden.json`; in this repo usually set to `data.json`)
+- `GARDEN_JSON_FILE` (default `garden.json`, typically set to `data.json`)
 - `NOSTR_RELAYS`
 - `NOSTR_KIND_DEFAULT`
 - `MIN_DIID`
 - `BLUESKY_PDS` (for `bsky_timeline_cli.py`)
+- `GARDEN_SITE_URL` (used by `build.py` for canonical/sitemap URLs)
 
 ## Local Run
 
 Frontend:
-- Serve with any static server (for service worker behavior, use HTTP server instead of opening `file://`).
+- serve with a static HTTP server (not `file://`)
 
-Python tools:
-- Install dependencies from your Python environment:
-  - `python-dotenv`
-  - `atproto`
-  - `nostr` package used by scripts (`nostr.key`, `nostr.event`, `nostr.relay_manager`)
+Python dependencies:
+- `python-dotenv`
+- `atproto`
+- `nostr` package providing:
+  - `nostr.key`
+  - `nostr.event`
+  - `nostr.relay_manager`
 
-## Notes and Current Constraints
+## Notes and Constraints
 
-- `post_note.py` is interactive-first and assumes a clean publish path (no dry-run mode).
-- `git push` is automatic when commit succeeds.
-- Nostr relay connections disable certificate checks (`ssl.CERT_NONE`), which is practical but less strict.
-- Frontend filtering is hash-based and client-only; there is no backend API.
-- Some legacy Electron add-overlay code is still present in `js/add.js` but is only active when `window.showAdd` is enabled.
+- `post_note.py` remains interactive-first
+- `git push` is automatic when commit succeeds
+- Nostr relay connections currently use `ssl.CERT_NONE`
+- `build.py` mutates `index.html` and generated artifacts (`notes/`, `sitemap.xml`)
+- frontend filtering remains hash-based and client-side
 
-## Bluesky Share Summary (<=300 chars)
-
-A static digital garden with Masonry UI, tag/type filters, and lightbox media. Includes Python tools to create notes, publish to Nostr + Bluesky, sync metadata back to JSON, and monitor a filtered Bluesky timeline from the terminal.

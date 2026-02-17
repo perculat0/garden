@@ -419,10 +419,13 @@ def publish_to_bluesky(
 # ========================
 
 def git_commit_and_push(repo_path: Path, message: str, json_path: Path):
-    subprocess.run(
-        ["git", "-C", str(repo_path), "add", str(json_path.relative_to(repo_path))],
-        check=True,
-    )
+    paths_to_add = [
+        str(json_path.relative_to(repo_path)),
+        "index.html",
+        "sitemap.xml",
+        "notes",
+    ]
+    subprocess.run(["git", "-C", str(repo_path), "add", *paths_to_add], check=True)
     result = subprocess.run(
         ["git", "-C", str(repo_path), "commit", "-m", message],
         check=False,
@@ -433,6 +436,13 @@ def git_commit_and_push(repo_path: Path, message: str, json_path: Path):
         subprocess.run(["git", "-C", str(repo_path), "push"], check=True)
     else:
         print("ℹ️ Nessun nuovo commit da pushare:", result.stderr.strip())
+
+
+def run_build(repo_path: Path):
+    build_script = repo_path / "build.py"
+    if not build_script.exists():
+        raise RuntimeError(f"build.py non trovato in {repo_path}")
+    subprocess.run([sys.executable, str(build_script)], cwd=repo_path, check=True)
 
 
 # ========================
@@ -606,6 +616,7 @@ def mode_create_and_publish(
 
     garden[title] = entry
     save_garden(json_path, garden)
+    run_build(repo_path)
 
     # 6) Git commit + push
     git_commit_and_push(
@@ -678,6 +689,7 @@ def mode_publish_pending(
         return
 
     save_garden(json_path, garden)
+    run_build(repo_path)
     git_commit_and_push(
         repo_path,
         message="Publish pending garden notes to Nostr and Bluesky",
