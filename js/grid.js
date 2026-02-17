@@ -66,6 +66,73 @@ function Grid()
   this.buildAllArticles = function(db)
   {
     let dbKeys = Object.keys(db);
+    let parseDateTuple = function(value)
+    {
+      if (typeof value !== 'string')
+      {
+        return null;
+      }
+
+      let match = value.trim().match(/^(\d{4,5})-(\d{2})-(\d{2})$/);
+      if (!match)
+      {
+        return null;
+      }
+
+      let year = parseInt(match[1], 10);
+      let month = parseInt(match[2], 10);
+      let day = parseInt(match[3], 10);
+
+      // Supporta formato olocenico (es. 12026-02-17 -> 2026-02-17)
+      if (year >= 10000)
+      {
+        year -= 10000;
+      }
+
+      if (month < 1 || month > 12 || day < 1 || day > 31)
+      {
+        return null;
+      }
+
+      return [year, month, day];
+    };
+
+    dbKeys.sort(function(a, b)
+    {
+      let aValue = db[a] || {};
+      let bValue = db[b] || {};
+      let aDate = parseDateTuple(aValue.DATE);
+      let bDate = parseDateTuple(bValue.DATE);
+
+      if (aDate && bDate)
+      {
+        for (let i = 0; i < 3; i++)
+        {
+          if (aDate[i] !== bDate[i])
+          {
+            return bDate[i] - aDate[i];
+          }
+        }
+      }
+      else if (aDate && !bDate)
+      {
+        return -1;
+      }
+      else if (!aDate && bDate)
+      {
+        return 1;
+      }
+
+      let aDiid = Number.isInteger(aValue.DIID) ? aValue.DIID : -1;
+      let bDiid = Number.isInteger(bValue.DIID) ? bValue.DIID : -1;
+      if (aDiid !== bDiid)
+      {
+        return bDiid - aDiid;
+      }
+
+      return a.localeCompare(b);
+    });
+
     let html = '';
     for (var i = 0; i < dbKeys.length; i++)
     {
