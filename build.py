@@ -20,6 +20,11 @@ def parse_args() -> argparse.Namespace:
         default="index.html",
         help="Index HTML template to update",
     )
+    parser.add_argument(
+        "--archive",
+        default="archivio.html",
+        help="Archive HTML output file with all notes",
+    )
     parser.add_argument("--notes-dir", default="notes", help="Notes output directory")
     parser.add_argument("--sitemap", default="sitemap.xml", help="Sitemap output file")
     parser.add_argument(
@@ -135,9 +140,10 @@ def entry_title(title: str) -> str:
     return html.escape(title, quote=True)
 
 
-def render_index_cards(entries: list[tuple[str, dict, str]]) -> str:
+def render_index_cards(entries: list[tuple[str, dict, str]], limit: int | None = None) -> str:
+    render_entries = entries if limit is None else entries[:limit]
     chunks = []
-    for title, entry, slug in entries:
+    for title, entry, slug in render_entries:
         title_html = entry_title(title)
         note_href = f"notes/{quote(slug)}.html"
         type_text = ", ".join(coerce_list(entry.get("TYPE")))
@@ -340,6 +346,7 @@ def main() -> int:
     repo_path = Path.cwd()
     data_path = (repo_path / args.data).resolve()
     index_path = (repo_path / args.index_template).resolve()
+    archive_path = (repo_path / args.archive).resolve()
     notes_dir = (repo_path / args.notes_dir).resolve()
     sitemap_path = (repo_path / args.sitemap).resolve()
 
@@ -375,10 +382,15 @@ def main() -> int:
             old.unlink()
 
     index_source = index_path.read_text(encoding="utf-8")
-    rendered = render_index_cards(entries)
-    updated_index = inject_main_content(index_source, rendered)
+    rendered_index = render_index_cards(entries, limit=10)
+    updated_index = inject_main_content(index_source, rendered_index)
     updated_index = ensure_indexable_meta(updated_index)
     index_path.write_text(updated_index, encoding="utf-8")
+
+    rendered_archive = render_index_cards(entries)
+    archive_html = inject_main_content(index_source, rendered_archive)
+    archive_html = ensure_indexable_meta(archive_html)
+    archive_path.write_text(archive_html, encoding="utf-8")
 
     sitemap = render_sitemap(entries, site_url)
     if sitemap:
