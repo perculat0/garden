@@ -300,5 +300,29 @@
     "BLUESKY_TEXT": "You're Gonna Need A Bigger Browser\narticle\n#ai #agents\n\n> But our idea of what a browser is and does for us hasn't moved much in a long time and if we intend to work towards greater user agency it seems plausible that we should at the very least be open to considering a major overhaul of what a Web…",
     "BLUESKY_EMBED_TYPE": "external",
     "BLUESKY_MEDIA_UPLOADED": true
+  },
+  "Voyages To The End Of The World: The Moral Costs Of Techno-Utopianism": {
+    "TYPE": [
+      "article"
+    ],
+    "TAGS": [
+      "society",
+      "bacon"
+    ],
+    "DATE": "12026-02-17",
+    "DONE": true,
+    "DIID": 18,
+    "NOSTR_KIND": 30023,
+    "LINK": "https://www.zerohedge.com/geopolitical/voyages-end-world-moral-costs-techno-utopianism",
+    "MEDIA_URL": "https://assets.zerohedge.com/s3fs-public/inline-images/image%20%2816%29_10.jpg?itok=1AA3tv3D",
+    "QOTE": "Whereas Christianity views redemption as a divine process that transcends history, Bacon relocates it firmly within human control. In doing so, modern technological civilization risks mistaking power for wisdom. This could have grave consequences as we enter an epoch defined by unprecedented technological advancement.",
+    "POSTED_TO_NOSTR": true,
+    "NOSTR_EVENT_ID": "905354ee67a515ad525796d5fd46dc80b489808170897b7e057f910cd1164a28",
+    "POSTED_TO_BLUESKY": true,
+    "BLUESKY_URI": "at://did:plc:jwd5bflvhakxk3x6yxhymfi6/app.bsky.feed.post/3mf233puhbs2n",
+    "BLUESKY_CID": "bafyreiaze6p7tcspvpk2sq2kawe66torhysb57atf2yee7yypzy73ql3gi",
+    "BLUESKY_TEXT": "Voyages To The End Of The World: The Moral Costs Of Techno-Utopianism\n\n> Whereas Christianity views redemption as a divine process that transcends history, Bacon relocates it firmly within human control. In doing so, modern technological civilization risks mistaking power for wisdom. This could hav…",
+    "BLUESKY_EMBED_TYPE": "external",
+    "BLUESKY_MEDIA_UPLOADED": true
   }
 }
