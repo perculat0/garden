@@ -115,6 +115,22 @@ def summarize_text(entry: dict, limit: int = 260) -> str:
     return text[: limit - 1].rstrip() + "…"
 
 
+def holocene_to_iso(date_value: str) -> str | None:
+    if not isinstance(date_value, str):
+        return None
+    m = re.match(r"^(\d{4,5})-(\d{2})-(\d{2})$", date_value.strip())
+    if not m:
+        return None
+    year = int(m.group(1))
+    month = int(m.group(2))
+    day = int(m.group(3))
+    if year >= 10000:
+        year -= 10000
+    if year < 1 or month < 1 or month > 12 or day < 1 or day > 31:
+        return None
+    return f"{year:04d}-{month:02d}-{day:02d}"
+
+
 def entry_title(title: str) -> str:
     return html.escape(title, quote=True)
 
@@ -200,6 +216,43 @@ def render_note_page(title: str, entry: dict, slug: str, site_url: str) -> str:
     note_path = f"/notes/{quote(slug)}.html"
     canonical = f"{site_url}{note_path}" if site_url else note_path
     canonical_html = html.escape(canonical, quote=True)
+    article_text = " ".join(collect_text_lines(entry)).strip()
+    iso_date = holocene_to_iso(str(entry.get("DATE", "")).strip())
+    author_name = os.environ.get("GARDEN_AUTHOR_NAME", "Perculato").strip() or "Perculato"
+    logo_url = f"{site_url}/sndldg.png" if site_url else "/sndldg.png"
+    schema_obj = {
+        "@context": "https://schema.org",
+        "@type": ["BlogPosting", "Article"],
+        "headline": title,
+        "description": summarize_text(entry, limit=300) or title,
+        "mainEntityOfPage": canonical,
+        "url": canonical,
+        "author": {
+            "@type": "Person",
+            "name": author_name,
+            "url": site_url or canonical,
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": author_name,
+            "logo": {
+                "@type": "ImageObject",
+                "url": logo_url,
+            },
+        },
+    }
+    if iso_date:
+        schema_obj["datePublished"] = iso_date
+        schema_obj["dateModified"] = iso_date
+    tags = coerce_list(entry.get("TAGS"))
+    if tags:
+        schema_obj["keywords"] = ", ".join(tags)
+    if article_text:
+        schema_obj["articleBody"] = article_text
+    media = entry.get("MEDIA_URL")
+    if isinstance(media, str) and media.strip() and re.search(r"\.(png|jpe?g|webp|gif)(\?|$)", media.strip(), re.I):
+        schema_obj["image"] = media.strip()
+    schema_json = html.escape(json.dumps(schema_obj, ensure_ascii=False), quote=False)
 
     details = []
     date_value = entry.get("DATE")
@@ -245,6 +298,7 @@ def render_note_page(title: str, entry: dict, slug: str, site_url: str) -> str:
   <meta property="og:description" content="{escaped_desc}">
   <meta property="og:type" content="article">
   <meta property="og:url" content="{canonical_html}">
+  <script type="application/ld+json">{schema_json}</script>
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
