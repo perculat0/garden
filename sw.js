@@ -1,4 +1,4 @@
-const CACHE_NAME = 'garden-cache-v4';
+const CACHE_NAME = 'garden-cache-v5';
 const ASSETS = [
   '/',
   '/index.html',
@@ -59,8 +59,10 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  const freshRequest = new Request(event.request, { cache: 'no-store' });
+
   event.respondWith(
-    fetch(event.request)
+    fetch(freshRequest)
       .then(response => {
         if (response && response.status === 200) {
           const copy = response.clone();
