@@ -200,12 +200,7 @@ def entry_description_for_bluesky(entry: dict, max_len: int = BLUESKY_DESC_MAX_L
 
     text = " ".join(parts).strip()
     if not text:
-        tags = entry.get("TAGS", [])
-        if isinstance(tags, list) and tags:
-            text = "Tags: " + ", ".join(str(t) for t in tags)
-
-    if not text:
-        text = "Shared from my digital garden."
+        text = "Condiviso dal mio digital garden."
 
     if len(text) <= max_len:
         return text
@@ -319,29 +314,13 @@ def build_bluesky_embed(
 
 def format_entry_content(title: str, entry: dict) -> str:
     """
-    Costruisce il testo del post Nostr a partire dalla entry del garden.
-    NON include più la data nel contenuto pubblicato.
+    Costruisce il testo del post (Nostr/Bluesky) a partire dalla entry del garden.
+    Include solo titolo, quote/testo, link e media.
     """
     lines = []
 
     # Titolo
     lines.append(f"{title}")
-
-    # Type (senza data)
-    types = entry.get("TYPE", [])
-    if isinstance(types, list):
-        type_str = ", ".join(types)
-    else:
-        type_str = str(types) if types else ""
-
-    if type_str:
-        lines.append(type_str)
-
-    # Tags inline
-    tags = entry.get("TAGS", [])
-    if tags:
-        hash_tags = " ".join(f"#{t.replace(' ', '_')}" for t in tags)
-        lines.append(hash_tags)
 
     # Quote / testo
     qote = entry.get("QOTE")
