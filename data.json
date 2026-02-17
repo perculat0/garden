@@ -389,5 +389,23 @@
     "BLUESKY_URI": "at://did:plc:jwd5bflvhakxk3x6yxhymfi6/app.bsky.feed.post/3mf2los3blc2i",
     "BLUESKY_CID": "bafyreidjqktknq3in3vfk2zmbp6ovwbl2g4wib5ffvtos7zthkmze7szeq",
     "BLUESKY_TEXT": "Skírnismál\n\n> Skírnismál is an Old Norse poem in the Poetic Edda, the collection of poems originally in Old Norse that contain the traditional myths and beliefs of the historical pre-Christian Norse people. In the 13th-century Icelandic manuscript Codex Regius, the poem is called Fǫr Skírnis (Skírn…"
+  },
+  "Build Community in resilient spaces": {
+    "TYPE": [
+      "article"
+    ],
+    "TAGS": [
+      "community",
+      "social",
+      "haraway"
+    ],
+    "DATE": "12026-02-17",
+    "DONE": true,
+    "DIID": 22,
+    "NOSTR_KIND": 30023,
+    "LINK": "https://www.joanwestenberg.com/communities-are-not-fungible/",
+    "QOTE": "Communities aren’t just collections of people, they’re built over time through countless small acts of trust, shared history, and daily interactions. You can’t just move everyone to a new place or recreate the same online platform and expect the same bonds to form. The real value of a community is in the relationships themselves, and once disrupted, that network of connections can’t be exactly rebuilt. Every decision that uproots people (physically or digitally) has a cost that can’t be measured.",
+    "POSTED_TO_NOSTR": false,
+    "POSTED_TO_BLUESKY": false
   }
 }

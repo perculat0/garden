@@ -24,6 +24,30 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .garden-logo-top-right {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 250;
+      display: inline-block;
+      line-height: 0;
+    }
+    .garden-logo-top-right img {
+      width: 96px;
+      height: auto;
+      display: block;
+    }
+    @media (max-width: 640px) {
+      .garden-logo-top-right {
+        top: 10px;
+        right: 10px;
+      }
+      .garden-logo-top-right img {
+        width: 72px;
+      }
+    }
+  </style>
   <script src="js/theme.js"></script>
   <script type="application/ld+json">
   {
@@ -63,6 +87,9 @@
   <script> let theme = new Theme(); theme.install(); theme.start(); </script>
   <div class="loading-wave"><div></div><div></div><div></div><div></div><div></div></div>
 
+  <a class="garden-logo-top-right" href="/" aria-label="Home">
+    <img src="sndldg.png" alt="Perculato logo">
+  </a>
   <nav></nav>
   <div class="container">
     <main data-media-url="enabled">
