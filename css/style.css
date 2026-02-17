@@ -79,6 +79,29 @@ a:active, a:focus {
   border: none;
 }
 
+.garden-logo-top-right {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 250;
+  display: inline-block;
+  line-height: 0;
+}
+.garden-logo-top-right img {
+  width: 96px;
+  height: auto;
+  display: block;
+}
+@media (max-width: 640px) {
+  .garden-logo-top-right {
+    top: 10px;
+    right: 10px;
+  }
+  .garden-logo-top-right img {
+    width: 72px;
+  }
+}
+
 /* LOADING */
 .loading-wave {
   display: inline-block;
