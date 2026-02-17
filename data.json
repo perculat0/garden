@@ -407,5 +407,45 @@
     "QOTE": "Communities aren’t just collections of people, they’re built over time through countless small acts of trust, shared history, and daily interactions. You can’t just move everyone to a new place or recreate the same online platform and expect the same bonds to form. The real value of a community is in the relationships themselves, and once disrupted, that network of connections can’t be exactly rebuilt. Every decision that uproots people (physically or digitally) has a cost that can’t be measured.",
     "POSTED_TO_NOSTR": false,
     "POSTED_TO_BLUESKY": false
+  },
+  "Longevity and balance with an emphasis on renewable energy.": {
+    "TYPE": [
+      "article"
+    ],
+    "TAGS": [
+      "solarpunk"
+    ],
+    "DATE": "12026-02-17",
+    "DONE": true,
+    "DIID": 23,
+    "NOSTR_KIND": 30023,
+    "LINK": "https://wiki.xxiivv.com/site/solarpunk.html",
+    "MEDIA_URL": "https://wiki.xxiivv.com/media/refs/living_bridge.jpg",
+    "QOTE": "Solarpunk is a movement centered on using and being affected by the use of renewable resources with a focus on decentralization, community activism, social justice and civic empowerment. A recognition that economic, social, and ecological injustices are all deeply inter-connected.Embracing approachable, personal technology and envisioning a world in which the detritus of consumer culture is appropriated and repurposed toward the reconstruction of a devastated ecology.",
+    "POSTED_TO_NOSTR": false,
+    "POSTED_TO_BLUESKY": false
+  },
+  "The Work Hidden Inside Gossip Goblin’s Worlds": {
+    "TYPE": [
+      "article"
+    ],
+    "TAGS": [
+      "gossipgoblin",
+      "ai",
+      "genai"
+    ],
+    "DATE": "12026-02-17",
+    "DONE": true,
+    "DIID": 24,
+    "NOSTR_KIND": 30023,
+    "LINK": "https://www.thedaringcreatives.com/the-work-hidden-inside-gossipgoblins-worlds/",
+    "MEDIA_URL": "https://www.thedaringcreatives.com/content/images/size/w2000/2025/11/823cab4d-7647-427a-b4d8-4170e7d4fa98.png",
+    "QOTE": "He says it plainly: “Every video starts with a script.” And when you see the kind of worlds he builds — from neo-feudal cyborg aristocrats to entire goblin civilizations — it makes sense. The writing is the spine and everything else hangs off it.",
+    "POSTED_TO_NOSTR": true,
+    "NOSTR_EVENT_ID": "f50b5c61c6024d14a89afd6096b391f874743248bc7f8eef64b002a6668be9e4",
+    "POSTED_TO_BLUESKY": true,
+    "BLUESKY_URI": "at://did:plc:jwd5bflvhakxk3x6yxhymfi6/app.bsky.feed.post/3mf2tphgj6n26",
+    "BLUESKY_CID": "bafyreigi72hy6ahelhhplqicnhmgwvbiwuhqo43txmq5wsw4mwdkfjjx4y",
+    "BLUESKY_TEXT": "The Work Hidden Inside Gossip Goblin’s Worlds\n\n> He says it plainly: “Every video starts with a script.” And when you see the kind of worlds he builds — from neo-feudal cyborg aristocrats to entire goblin civilizations — it makes sense. The writing is the spine and everything else hangs off it.\n\n🔗…"
   }
 }
