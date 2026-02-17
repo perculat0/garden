@@ -584,7 +584,11 @@ def mode_create_and_publish(
 
     confirm = input("Pubblico su Nostr + Bluesky? [Y/n]: ").strip().lower()
     if confirm and confirm not in ("y", "yes"):
-        print("Annullato, nessuna pubblicazione.")
+        entry["POSTED_TO_NOSTR"] = False
+        entry["POSTED_TO_BLUESKY"] = False
+        garden[title] = entry
+        save_garden(json_path, garden)
+        print("Pubblicazione social saltata. Nota salvata in data.json.")
         return
 
     # 3) Pubblica su Nostr
