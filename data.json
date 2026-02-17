@@ -324,5 +324,27 @@
     "BLUESKY_TEXT": "Voyages To The End Of The World: The Moral Costs Of Techno-Utopianism\n\n> Whereas Christianity views redemption as a divine process that transcends history, Bacon relocates it firmly within human control. In doing so, modern technological civilization risks mistaking power for wisdom. This could hav…",
     "BLUESKY_EMBED_TYPE": "external",
     "BLUESKY_MEDIA_UPLOADED": true
+  },
+  "Digital Garden + Nostr/Bluesky Toolkit": {
+    "TYPE": [
+      "link"
+    ],
+    "TAGS": [
+      "github",
+      "personal project"
+    ],
+    "DATE": "12026-02-17",
+    "DONE": true,
+    "DIID": 19,
+    "NOSTR_KIND": 1,
+    "LINK": "https://github.com/perculat0/garden",
+    "QOTE": "Un giardino digitale statico con interfaccia utente Masonry, filtri per tag/tipi e lightbox multimediale. Include strumenti Python per creare note, pubblicare su Nostr + Bluesky, sincronizzare i metadati in JSON e monitorare una cronologia Bluesky filtrata dal terminale.",
+    "POSTED_TO_NOSTR": true,
+    "NOSTR_EVENT_ID": "cb29b9ac9eb8c59be35b60188e3841fb78ad2a7890d76ce7109f96c310eeb62f",
+    "POSTED_TO_BLUESKY": true,
+    "BLUESKY_URI": "at://did:plc:jwd5bflvhakxk3x6yxhymfi6/app.bsky.feed.post/3mf23w22xcb2g",
+    "BLUESKY_CID": "bafyreidelfsrydi5iv3uc52kk5sier5tg23ntz72yrprj4k6qx6ijhgwmu",
+    "BLUESKY_TEXT": "Digital Garden + Nostr/Bluesky Toolkit\n\n> Un giardino digitale statico con interfaccia utente Masonry, filtri per tag/tipi e lightbox multimediale. Include strumenti Python per creare note, pubblicare su Nostr + Bluesky, sincronizzare i metadati in JSON e monitorare una cronologia Bluesky filtrata…",
+    "BLUESKY_EMBED_TYPE": "external"
   }
 }
