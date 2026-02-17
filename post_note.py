@@ -422,6 +422,7 @@ def git_commit_and_push(repo_path: Path, message: str, json_path: Path):
     paths_to_add = [
         str(json_path.relative_to(repo_path)),
         "index.html",
+        "archivio.html",
         "sitemap.xml",
         "notes",
     ]

@@ -102,7 +102,7 @@ Main flow:
 3. Publish to Bluesky
 4. Update `data.json`
 5. Run `build.py` automatically
-6. Git add/commit/push (`data.json`, `index.html`, `notes/`, `sitemap.xml`)
+6. Git add/commit/push (`data.json`, `index.html`, `archivio.html`, `notes/`, `sitemap.xml`)
 
 Pending mode:
 ```bash
@@ -207,5 +207,5 @@ Python dependencies:
 - `post_note.py` remains interactive-first
 - `git push` is automatic when commit succeeds
 - Nostr relay connections currently use `ssl.CERT_NONE`
-- `build.py` mutates `index.html` and generated artifacts (`notes/`, `sitemap.xml`)
+- `build.py` mutates `index.html` and generated artifacts (`archivio.html`, `notes/`, `sitemap.xml`)
 - frontend filtering remains hash-based and client-side
