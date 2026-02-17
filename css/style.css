@@ -47,7 +47,7 @@
   --cursor-expandImage: zoom-in;
   --cursor-minimizeImage: zoom-out;
   --background:black;
-  
+  --color:white;
 }
 
 * {
