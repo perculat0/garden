@@ -83,15 +83,27 @@ def date_sort_key(value) -> tuple:
     m = re.match(r"^(\d{4,5})-(\d{2})-(\d{2})$", value.strip())
     if not m:
         return (0, 0, 0)
-    return (int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    year = int(m.group(1))
+    month = int(m.group(2))
+    day = int(m.group(3))
+    if year >= 10000:
+        year -= 10000
+    if month < 1 or month > 12 or day < 1 or day > 31:
+        return (0, 0, 0)
+    return (year, month, day)
 
 
 def entry_sort_key(item):
     _title, entry = item
     diid = entry.get("DIID")
-    if isinstance(diid, int):
-        return (2, diid)
-    return (1, date_sort_key(entry.get("DATE")))
+    diid_key = diid if isinstance(diid, int) else -1
+    date_key = date_sort_key(entry.get("DATE"))
+    has_date = 1 if date_key != (0, 0, 0) else 0
+    return (has_date, date_key, diid_key)
+
+
+def sort_garden_items(garden: dict) -> list[tuple[str, dict]]:
+    return sorted(garden.items(), key=entry_sort_key, reverse=True)
 
 
 def strip_quote_prefix(line: str) -> str:
@@ -351,7 +363,7 @@ def main() -> int:
     sitemap_path = (repo_path / args.sitemap).resolve()
 
     garden = load_json(data_path)
-    sorted_items = sorted(garden.items(), key=entry_sort_key, reverse=True)
+    sorted_items = sort_garden_items(garden)
 
     used_slugs = set()
     entries = []

@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile Python scripts
+        run: |
+          python -m py_compile build.py post_note.py post_simple.py note.py scripts/validate_structured_data.py
+
+      - name: Run unit tests
+        run: |
+          python -m unittest discover -s tests -v
+
+      - name: Run static build
+        run: |
+          python build.py
+
+      - name: Validate structured data (Rich Results precheck)
+        run: |
+          python scripts/validate_structured_data.py --index index.html --notes-dir notes

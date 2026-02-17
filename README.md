@@ -4,6 +4,7 @@ A personal digital garden served as a static website, with Python automation to 
 
 This repository now includes a static SEO build pipeline:
 - prerendered homepage content in `index.html`
+- full prerendered archive in `archivio.html`
 - one HTML page per note in `notes/`
 - generated `sitemap.xml`
 
@@ -12,8 +13,12 @@ This repository now includes a static SEO build pipeline:
 - `data.json`: canonical content database (`title -> entry object`)
 - `build.py`: static build generator (index prerender + note pages + sitemap)
 - `index.html`: main page template + prerendered note content
+- `archivio.html`: generated full archive page with all notes prerendered
 - `notes/`: generated static pages, one per note (`notes/<slug>.html`)
 - `sitemap.xml`: generated sitemap for crawlers
+- `tests/test_build.py`: unit tests for sorting, limits and schema generation
+- `scripts/validate_structured_data.py`: JSON-LD validation precheck
+- `.github/workflows/ci.yml`: CI + scheduled structured-data validation
 - `css/style.css`: UI styling
 - `js/`: frontend app (filters, masonry, lightbox, nav, helpers)
 - `post_note.py`: interactive note creation + publish to Nostr/Bluesky + auto build + git commit/push
@@ -68,17 +73,18 @@ python build.py
 
 What it does:
 1. Reads `data.json`
-2. Sorts entries (prefers `DIID`, falls back to `DATE`)
+2. Sorts entries by `DATE` descending (fallback `DIID` descending)
 3. Generates stable slugs from note titles
 4. Writes `notes/<slug>.html` for each entry
 5. Removes stale generated note pages
-6. Replaces content inside `<main>...</main>` in `index.html` with prerendered cards
-7. Updates robots meta to `index, follow`
-8. Generates `sitemap.xml` if a site URL is available
+6. Replaces content inside `<main>...</main>` in `index.html` with the latest 10 prerendered cards
+7. Generates `archivio.html` with all prerendered cards
+8. Updates robots meta to `index, follow`
+9. Generates `sitemap.xml` if a site URL is available
 
 Optional args:
 ```bash
-python build.py --data data.json --index-template index.html --notes-dir notes --sitemap sitemap.xml --site-url https://example.com
+python build.py --data data.json --index-template index.html --archive archivio.html --notes-dir notes --sitemap sitemap.xml --site-url https://example.com
 ```
 
 Site URL resolution priority:
@@ -140,6 +146,31 @@ So you get both:
 - crawlable initial HTML
 - interactive client-side UX
 
+## Structured Data
+
+- `index.html` includes JSON-LD for `Person` and `WebSite`
+- each `notes/<slug>.html` includes JSON-LD for `BlogPosting`/`Article`, plus `publisher.logo` (`sndldg.png`)
+
+## Tests and CI
+
+Run local tests:
+```bash
+python -m unittest discover -s tests -v
+```
+
+Run structured-data validation precheck:
+```bash
+python scripts/validate_structured_data.py --index index.html --notes-dir notes
+```
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on:
+- push
+- pull request
+- manual trigger
+- schedule (weekly, Monday)
+
+The scheduled job performs a Rich Results precheck by validating generated JSON-LD structure.
+
 ## Environment Configuration
 
 Copy `.env_example` to `.env`.
@@ -178,4 +209,3 @@ Python dependencies:
 - Nostr relay connections currently use `ssl.CERT_NONE`
 - `build.py` mutates `index.html` and generated artifacts (`notes/`, `sitemap.xml`)
 - frontend filtering remains hash-based and client-side
-
