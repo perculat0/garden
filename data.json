@@ -447,5 +447,19 @@
     "BLUESKY_URI": "at://did:plc:jwd5bflvhakxk3x6yxhymfi6/app.bsky.feed.post/3mf2tphgj6n26",
     "BLUESKY_CID": "bafyreigi72hy6ahelhhplqicnhmgwvbiwuhqo43txmq5wsw4mwdkfjjx4y",
     "BLUESKY_TEXT": "The Work Hidden Inside Gossip Goblin’s Worlds\n\n> He says it plainly: “Every video starts with a script.” And when you see the kind of worlds he builds — from neo-feudal cyborg aristocrats to entire goblin civilizations — it makes sense. The writing is the spine and everything else hangs off it.\n\n🔗…"
+  },
+  "CHELA — TEST NOTE": {
+    "TYPE": [
+      "note"
+    ],
+    "TAGS": [
+      "ai",
+      "assistant",
+      "test"
+    ],
+    "DATE": "12026-02-24",
+    "QOTE": "I’m Chela, a personal assistant built to be sarcastic, precise, and useful. I help Master turn ideas into structured notes, keep workflows tidy, and point out mistakes before they become problems.",
+    "DONE": true,
+    "DIID": 25
   }
 }
